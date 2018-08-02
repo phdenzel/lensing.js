@@ -77,6 +77,8 @@ var LensModule = (function() {
 
     function source(px, py, dstID, srcID) {
         // put the source image data back into destination image data at (px, py)
+        px = px || center.x;
+        py = py || center.y;
         dstID = dstID || imageDataDst;
         srcID = srcID || imageDataSrc;
         
@@ -101,11 +103,15 @@ var LensModule = (function() {
                 dstID.data[idxDst] = 255;                  // a
             }
         }
+
+        return dstID;
     }
 
 
     function process(px, py, dstID, srcID) {
         // let LensModule process image data with new center at (px, py)
+        px = px || center.x;
+        py = py || center.y;
         dstID = dstID || imageDataDst;
         srcID = srcID || imageDataSrc;
 
@@ -125,6 +131,7 @@ var LensModule = (function() {
         }
 
         dstID.data = dstData;
+        return dstID;
     }
 
 
@@ -188,18 +195,18 @@ var LensModule = (function() {
     }
     
 
-    function startLoop() {
-        imageCvs.addEventListener('mousemove', listener, false);
-    }
-
- 
-    function listener(evt) {
-        var mousePosition = trackMouse(evt);
-        source(center.x, center.y);
-        process(mousePosition.x, mousePosition.y);
-        imageCtx.putImageData(imageDataDst, 0, 0);
-        setCenter(mousePosition.x, mousePosition.y);
-        
+    function startLoop(loopF) {
+        loopF = loopF || null;
+        if (typeof loopF === 'function') {
+            loopF()
+        } else {
+            imageCvs.addEventListener('mousemove', function(evt) {
+                var mousePosition = trackMouse(evt);
+                process(mousePosition.x, mousePosition.y);
+                setCenter(mousePosition.x, mousePosition.y);
+                imageCtx.putImageData(imageDataDst, 0, 0);
+            }, false);
+        };
     }
 
     
@@ -249,6 +256,19 @@ var LensModule = (function() {
         tolerance = tol;
     }
 
+    
+    function getImageDataDst() {
+        return imageDataDst;
+    }
+
+    function setImageDataDst(imageData) {
+        imageDataDst = imageData;
+    }
+
+    function getImageDataSrc() {
+        return imageDataSrc;
+    }
+
 
     return {
 
@@ -261,13 +281,16 @@ var LensModule = (function() {
         setCenter: setCenter,
         getTolerance: getTolerance,
         setTolerance: setTolerance,
+        getImageDataDst: getImageDataDst,
+        setImageDataDst: setImageDataDst,
 
         // functions
         init,
         readImage,
         source,
         process,
-        startLoop
+        startLoop,
+        trackMouse
 
     };
 })();
