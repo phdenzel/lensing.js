@@ -127,7 +127,7 @@ var LensModule = (function() {
             dstData = pointLens(dstData, srcData, px, py);
             break;
         default:
-            dstData = isotherm_lens(dstData, srcData, px, py);   
+            dstData = isothermLens(dstData, srcData, px, py);   
         }
 
         dstID.data = dstData;
@@ -151,6 +151,9 @@ var LensModule = (function() {
 
         maxSize = imageWidth * (imageHeight - 1) + imageWidth - 1;
 
+        cs = Math.cos(0.4);
+        sn = Math.sin(0.4);
+
         for (y = ymin; y < ymax; y++) {
             idxDst = (xmin + y * imageWidth) << 2;
             ybuf = y - py;
@@ -163,7 +166,9 @@ var LensModule = (function() {
 
                     // actual lensing equation
                     dx = Math.floor(x - xbuf * deflection);
-                    dy = Math.floor(y - ybuf * deflection);
+                    dy = Math.floor(y - ybuf * 2.5 * deflection);
+                    // dx = cs*d0x - sn*d0y;
+                    // dy = sn*d0x + cs*d0y;
 
                     // antialiasing (while preserving brightness more or less)
                     if (deflection < tolerance * 0.9 && deflection > tolerance * 1.1) {
