@@ -198,6 +198,20 @@ var LensModule = (function() {
     function pointLens(lensData, unlensedData, px, py) {
         return lensData
     }
+
+
+    function staticUpdate(evt) {
+        // console.log(evt.type)
+        if (evt.type == 'touchmove') {
+            evt.preventDefault()
+            var mp = trackTouch(evt);
+        } else {
+            var mp = trackMouse(evt);
+        }
+        process(mp.x, mp.y);
+        setCenter(mp.x, mp.y);
+        imageCtx.putImageData(imageDataDst, 0, 0);
+    }
     
 
     function startLoop(loopF) {
@@ -205,16 +219,12 @@ var LensModule = (function() {
         if (typeof loopF === 'function') {
             loopF()
         } else {
-            imageCvs.addEventListener('mousemove', function(evt) {
-                var mousePosition = trackMouse(evt);
-                process(mousePosition.x, mousePosition.y);
-                setCenter(mousePosition.x, mousePosition.y);
-                imageCtx.putImageData(imageDataDst, 0, 0);
-            }, false);
+            imageCvs.addEventListener('mousemove', staticUpdate, false);
+            imageCvs.addEventListener('touchmove', staticUpdate, {passive: false});
         };
     }
 
-    
+
     function trackMouse(evt) {
         return {
             x: (evt.clientX / windowWidth  * imageWidth)  >> 0,
@@ -231,6 +241,7 @@ var LensModule = (function() {
     }
 
 
+    
 
 
     // getters and setters
