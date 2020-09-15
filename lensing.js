@@ -223,7 +223,7 @@ var LensModule = (function() {
     }
 
     function trackTouch(evt) {
-        console.log(evt.touches[0]);
+        // console.log(evt.touches[0]);
         return {
             x: (evt.touches[0].clientX / windowWidth * imageWidth) >> 0,
             y: (evt.touches[0].clientY / windowHeight * imageHeight) >> 0
